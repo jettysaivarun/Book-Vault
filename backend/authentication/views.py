@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import login
 from librarymanagement.models import Member
+from django.contrib.auth.models import User
 # Create your views here.
 class RegistrationView(generics.CreateAPIView):
     serializer_class=RegistrationSerializer
@@ -36,3 +37,25 @@ class LoginView(APIView):
             },status=status.HTTP_200_OK)
             
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+class CheckUsernameView(generics.CreateAPIView):
+
+    def create(self, request):
+        username = request.data.get('username', '').strip()
+
+        if not username:
+            return Response(
+                {'message': 'Username is required.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if User.objects.filter(username=username).exists():
+            return Response(
+                {'message': 'Username already exists.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(
+            {'message': 'Username is available.'},
+            status=status.HTTP_200_OK
+        )

@@ -11,7 +11,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if len(value)<8:
             raise serializers.ValidationError("password should be more or equal to 8 characters")
         if value.isalnum():
-            raise serializers.ValidationError("Password should contains atleast one special characcter")
+            raise serializers.ValidationError("Password should contains atleast one special character")
         return value
     def validate_username(self,value):
         if User.objects.filter(username=value).exists():
