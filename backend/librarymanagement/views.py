@@ -12,7 +12,24 @@ class BookView(viewsets.ModelViewSet):
     serializer_class=BookSerializer
     filter_backends=[filters.SearchFilter]
     search_fields=["title","author","publisher","isbn","category","language"]
-    
+    @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
+    def book_of_the_day(self,request): 
+        try:
+            prev_book=Book.objects.get(is_book_of_the_day=True)
+            prev_book.is_book_of_the_day=False
+            prev_book.save()
+        except Book.DoesNotExist:
+            pass
+                
+        book_id=request.data.get('book_id')
+        try:
+            book=Book.objects.get(id=book_id)
+        except Book.DoesNotExist:
+            return Response({"error":"The Book Doesn't exist"},status=status.HTTP_404_NOT_FOUND)
+        book.is_book_of_the_day=True
+        book.save()
+        serializer=self.get_serializer(book)
+        return Response(serializer.data,status=status.HTTP_200_OK)
         
 class BookCopyView(viewsets.ModelViewSet):
     queryset=BookCopy.objects.all()
@@ -78,8 +95,9 @@ class BorrowRecordView(viewsets.ModelViewSet):
         book_copy.status="AVAILABLE"
         borrow_record.save()
         serializer=self.get_serializer(borrow_record)
-        return Response(serializer.data,status=status.HTTP_200_OK) 
-    
+        return Response(serializer.data,status=status.HTTP_200_OK)
 class MemberView(viewsets.ModelViewSet):
     queryset=Member.objects.all()
     serializer_class=MemberSerializer
+    
+    

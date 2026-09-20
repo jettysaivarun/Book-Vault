@@ -32,6 +32,8 @@ class Book(models.Model):
         ("GERMAN", "GERMAN"),
     ]
     id=models.IntegerField(unique=True,primary_key=True)
+    image=models.ImageField(upload_to="book_images/",null=True,blank=True)
+    is_book_of_the_day=models.BooleanField(default=False)
     title=models.CharField(max_length=100)
     isbn=models.CharField(max_length=10,unique=True)
     author=models.CharField(max_length=100)
