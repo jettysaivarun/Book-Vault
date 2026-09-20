@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "notifications",
     "rest_framework",
     "corsheaders", #frontend
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 MIDDLEWARE = [

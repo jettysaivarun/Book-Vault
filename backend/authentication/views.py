@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import login
 from librarymanagement.models import Member
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated,AllowAny
 # Create your views here.
 class RegistrationView(generics.CreateAPIView):
     serializer_class=RegistrationSerializer
@@ -59,3 +60,12 @@ class CheckUsernameView(generics.CreateAPIView):
             {'message': 'Username is available.'},
             status=status.HTTP_200_OK
         )
+        
+class LogoutView(APIView):
+    permission_classes=[AllowAny]
+    def post(self,request):
+        refresh_token=request.data.get('refresh_token')
+        token=RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({"message":"Logged Out Successful"})
+    
