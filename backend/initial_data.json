@@ -1,0 +1,37 @@
+[
+{
+    "model": "librarymanagement.book",
+    "pk": 1,
+    "fields": {
+        "image": "book_images/Screenshot_From_2026-09-20_13-33-26.png",
+        "is_book_of_the_day": false,
+        "title": "Pride and Prejudice",
+        "isbn": "2026S001",
+        "author": "Jane Austen",
+        "publisher": "John",
+        "category": "ARTS",
+        "language": "ENGLISH"
+    }
+},
+{
+    "model": "librarymanagement.book",
+    "pk": 2,
+    "fields": {
+        "image": "book_images/Screenshot_From_2026-09-20_13-36-11.png",
+        "is_book_of_the_day": true,
+        "title": "1984",
+        "isbn": "2026S002",
+        "author": "George Orwell",
+        "publisher": "John Cerral",
+        "category": "HISTORY",
+        "language": "ENGLISH"
+    }
+},
+{
+    "model": "librarymanagement.member",
+    "pk": 1,
+    "fields": {
+        "user": 1
+    }
+}
+]
