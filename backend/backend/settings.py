@@ -146,3 +146,7 @@ CORS_ALLOWED_ORIGINS = [
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+'''localStorage.removeItem('access_token')
+localStorage.removeItem('refresh_token')
+localStorage.removeItem('username')  for logout'''

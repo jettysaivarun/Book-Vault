@@ -1,3 +1,4 @@
+
 import {
   BrowserRouter,
   Routes,
@@ -7,11 +8,14 @@ import {
 
 import Login from './pages/LoginPage'
 import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+import AllBooks from './pages/AllBooks'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route
           path="/"
           element={<Navigate to="/login" replace />}
@@ -26,9 +30,20 @@ function App() {
           path="/register"
           element={<Register />}
         />
+
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+        <Route
+  path="/all-books"
+  element={<AllBooks />}
+/>
+
       </Routes>
     </BrowserRouter>
   )
 }
 
 export default App
+

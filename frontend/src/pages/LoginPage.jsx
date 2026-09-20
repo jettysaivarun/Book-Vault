@@ -59,6 +59,8 @@ function Login() {
 
       localStorage.setItem('access_token', access)
       localStorage.setItem('refresh_token', refresh)
+      localStorage.setItem('username', username.trim())
+      navigate('/dashboard')
 
       console.log('Login successful')
 

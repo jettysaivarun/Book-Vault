@@ -110,14 +110,19 @@ function Register() {
       setLoading(true)
 
       const response = await api.post('/api/auth/register/', {
-        username: username.trim(),
-        email: email.trim(),
-        password,
-      })
+  username: username.trim(),
+  email: email.trim(),
+  password,
+})
+const { access, refresh, username: registeredUsername } = response.data
 
       console.log('Registration successful:', response.data)
 
-      navigate('/login')
+      localStorage.setItem('access_token', access)
+localStorage.setItem('refresh_token', refresh)
+localStorage.setItem('username', registeredUsername)
+
+navigate('/dashboard')
     } catch (error) {
       console.error('Registration failed:', error)
 

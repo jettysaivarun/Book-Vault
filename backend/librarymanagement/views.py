@@ -13,7 +13,7 @@ class BookView(viewsets.ModelViewSet):
     filter_backends=[filters.SearchFilter]
     search_fields=["title","author","publisher","isbn","category","language"]
     @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
-    def book_of_the_day(self,request): 
+    def update_book_of_the_day(self,request): 
         try:
             prev_book=Book.objects.get(is_book_of_the_day=True)
             prev_book.is_book_of_the_day=False
@@ -30,7 +30,14 @@ class BookView(viewsets.ModelViewSet):
         book.save()
         serializer=self.get_serializer(book)
         return Response(serializer.data,status=status.HTTP_200_OK)
-        
+    @action(detail=False,methods=['get'],permission_classes=[IsAuthenticated])
+    def get_book_of_the_day(self,request):
+        try:
+            book=Book.objects.get(is_book_of_the_day=True)
+        except Book.DoesNotExist:
+            return Response({"error":"No book is matched as book of the day"})
+        serializer=self.get_serializer(book)
+        return Response(serializer.data,status=status.HTTP_200_OK)        
 class BookCopyView(viewsets.ModelViewSet):
     queryset=BookCopy.objects.all()
     serializer_class=BookCopySerializer
