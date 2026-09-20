@@ -1,0 +1,923 @@
+.book-details-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+
+  background:
+    rgba(16, 39, 32, 0.42);
+
+  backdrop-filter:
+    blur(7px);
+
+  animation:
+    bookDetailsFadeIn 0.25s ease;
+}
+
+
+.book-details-modal {
+  position: relative;
+
+  width: min(1080px, 100%);
+
+  max-height: calc(100vh - 60px);
+
+  display: grid;
+
+  grid-template-columns: 295px minmax(0, 1fr);
+
+  overflow: hidden;
+
+  border-radius: 25px;
+
+  background:
+    #fffdf8;
+
+  box-shadow:
+    0 30px 80px
+      rgba(20, 48, 40, 0.22);
+
+  animation:
+    bookDetailsSlideUp 0.3s ease;
+}
+
+
+/* ========================================
+   CLOSE
+======================================== */
+
+.book-details-close {
+  position: absolute;
+
+  top: 16px;
+  right: 16px;
+
+  z-index: 5;
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    rgba(23, 63, 52, 0.13);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 253, 248, 0.9);
+
+  color: #315d4d;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.book-details-close:hover {
+  background: #edf3ed;
+
+  transform: rotate(4deg);
+}
+
+
+/* ========================================
+   LEFT
+======================================== */
+
+.book-details-left {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  padding: 30px 25px;
+
+  background:
+    radial-gradient(
+      circle at 50% 25%,
+      rgba(207, 215, 198, 0.4),
+      transparent 50%
+    ),
+    #f0ede4;
+}
+
+
+.book-details-cover {
+  width: 205px;
+
+  height: 305px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin: 8px 0 28px;
+}
+
+
+.book-details-cover img {
+  width: 190px;
+
+  height: 285px;
+
+  object-fit: cover;
+
+  border-radius: 7px;
+
+  box-shadow:
+    0 18px 30px
+      rgba(28, 49, 42, 0.2);
+}
+
+
+.book-details-cover-placeholder {
+  width: 190px;
+
+  height: 285px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  padding: 20px;
+
+  border-radius: 8px;
+
+  background: #e1ddd1;
+
+  color: #587566;
+
+  text-align: center;
+}
+
+
+.book-details-cover-placeholder span {
+  color: #496b5b;
+
+  font-family:
+    Georgia,
+    'Times New Roman',
+    serif;
+
+  font-size: 15px;
+
+  line-height: 1.35;
+}
+
+
+/* ========================================
+   ACTION BUTTONS
+======================================== */
+
+.book-details-action {
+  width: 100%;
+
+  height: 50px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 11px;
+
+  margin-top: 10px;
+
+  border:
+    1px solid
+    rgba(23, 63, 52, 0.11);
+
+  border-radius: 11px;
+
+  background: #fffdf9;
+
+  color: #21483b;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.book-details-action:hover {
+  transform: translateY(-2px);
+
+  background: #f5f8f3;
+
+  box-shadow:
+    0 7px 16px
+      rgba(35, 67, 55, 0.08);
+}
+
+
+.book-details-action.primary {
+  border-color: #154b3d;
+
+  background: #154b3d;
+
+  color: #fffdf7;
+}
+
+
+.book-details-action.primary:hover {
+  background: #1c5a49;
+}
+
+
+/* ========================================
+   DISABLED BORROW BUTTON
+======================================== */
+
+.book-details-action:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+.book-details-action.primary:disabled:hover {
+  background: #154b3d;
+
+  box-shadow: none;
+
+  transform: none;
+}
+
+
+/* ========================================
+   MAIN
+======================================== */
+
+.book-details-main {
+  min-width: 0;
+
+  overflow-y: auto;
+
+  padding: 38px 40px 35px;
+}
+
+
+.book-details-category {
+  display: inline-flex;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  background: #e8f1e9;
+
+  color: #47715e;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.7px;
+}
+
+
+.book-details-heading h2 {
+  margin: 13px 0 4px;
+
+  color: #173f34;
+
+  font-family:
+    Georgia,
+    'Times New Roman',
+    serif;
+
+  font-size: 42px;
+
+  line-height: 1.05;
+
+  font-weight: 600;
+
+  letter-spacing: -1px;
+}
+
+
+.book-details-author {
+  margin: 0;
+
+  color: #777d76;
+
+  font-size: 15px;
+}
+
+
+/* ========================================
+   META
+======================================== */
+
+.book-details-meta {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 12px;
+
+  margin-top: 24px;
+
+  padding: 19px 0;
+
+  border-top:
+    1px solid
+    rgba(23, 63, 52, 0.09);
+
+  border-bottom:
+    1px solid
+    rgba(23, 63, 52, 0.09);
+}
+
+
+.book-details-meta > div {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  min-width: 0;
+}
+
+
+.book-details-meta svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+
+  color: #37705c;
+}
+
+
+.book-details-meta span {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  min-width: 0;
+
+  color: #456458;
+
+  font-size: 11px;
+
+  word-break: break-word;
+}
+
+
+.book-details-meta small {
+  color: #969890;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+}
+
+
+/* ========================================
+   ABOUT
+======================================== */
+
+.book-details-about {
+  margin-top: 24px;
+}
+
+
+.book-details-about h3,
+.book-details-copies h3 {
+  margin: 0;
+
+  color: #183f34;
+
+  font-family:
+    Georgia,
+    'Times New Roman',
+    serif;
+
+  font-size: 18px;
+}
+
+
+.book-details-about p {
+  max-width: 700px;
+
+  margin: 10px 0 0;
+
+  color: #70766f;
+
+  font-size: 12px;
+
+  line-height: 1.7;
+}
+
+
+/* ========================================
+   COPIES
+======================================== */
+
+.book-details-copies {
+  margin-top: 25px;
+
+  padding: 18px;
+
+  border-radius: 16px;
+
+  background: #f5f2e9;
+}
+
+
+.book-details-section-heading {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 14px;
+}
+
+
+.book-details-section-heading > div {
+  min-width: 0;
+}
+
+
+.book-details-section-heading h3 {
+  margin: 0;
+}
+
+
+.book-details-section-heading p {
+  margin: 4px 0 0;
+
+  color: #8a8d85;
+
+  font-size: 9px;
+}
+
+
+.book-details-section-heading > span {
+  flex-shrink: 0;
+
+  color: #5a7869;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+
+/* ========================================
+   COPY GRID
+======================================== */
+
+.book-details-copy-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: 8px;
+}
+
+
+.book-copy-status {
+  min-width: 0;
+
+  padding: 12px 9px;
+
+  border-radius: 11px;
+
+  background: #fffdf9;
+
+  text-align: center;
+}
+
+
+.book-copy-icon {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 8px;
+
+  border-radius: 50%;
+}
+
+
+.book-copy-status strong {
+  display: block;
+
+  color: #183f34;
+
+  font-family:
+    Georgia,
+    'Times New Roman',
+    serif;
+
+  font-size: 20px;
+}
+
+
+.book-copy-status span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #7c8079;
+
+  font-size: 8px;
+
+  line-height: 1.2;
+}
+
+
+/* ========================================
+   AVAILABLE
+======================================== */
+
+.book-copy-status.available
+.book-copy-icon {
+  background: #dff2e5;
+
+  color: #359267;
+}
+
+
+/* ========================================
+   BORROWED
+======================================== */
+
+.book-copy-status.borrowed
+.book-copy-icon {
+  background: #fff0d8;
+
+  color: #d88a20;
+}
+
+
+/* ========================================
+   RESERVED
+======================================== */
+
+.book-copy-status.reserved
+.book-copy-icon {
+  background: #e1edff;
+
+  color: #4c8ed9;
+}
+
+
+/* ========================================
+   LOST
+======================================== */
+
+.book-copy-status.lost
+.book-copy-icon {
+  background: #f8dddd;
+
+  color: #d95b5b;
+}
+
+
+/* ========================================
+   DAMAGED
+======================================== */
+
+.book-copy-status.damaged
+.book-copy-icon {
+  background: #f8e5d8;
+
+  color: #c8753e;
+}
+
+
+/* ========================================
+   TOTAL
+======================================== */
+
+.book-copy-status.total
+.book-copy-icon {
+  background: #e8e7f5;
+
+  color: #6664a0;
+}
+
+
+/* ========================================
+   STATUS
+======================================== */
+
+.book-details-status {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+
+  margin-top: 17px;
+
+  padding: 16px 18px;
+
+  border-radius: 15px;
+}
+
+
+.book-details-status-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+.book-details-status strong {
+  font-size: 12px;
+}
+
+
+.book-details-status p {
+  margin: 4px 0 0;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+/* AVAILABLE STATUS */
+
+.book-details-status.is-available {
+  background: #eaf5ec;
+}
+
+
+.book-details-status.is-available
+.book-details-status-icon {
+  background: #d5efdb;
+
+  color: #3d9863;
+}
+
+
+.book-details-status.is-available strong {
+  color: #246344;
+}
+
+
+.book-details-status.is-available p {
+  color: #668072;
+}
+
+
+/* UNAVAILABLE STATUS */
+
+.book-details-status.is-unavailable {
+  background: #f8eeee;
+}
+
+
+.book-details-status.is-unavailable
+.book-details-status-icon {
+  background: #f4dada;
+
+  color: #c95d5d;
+}
+
+
+.book-details-status.is-unavailable strong {
+  color: #9d4c4c;
+}
+
+
+.book-details-status.is-unavailable p {
+  color: #9b7777;
+}
+
+
+/* ========================================
+   ANIMATION
+======================================== */
+
+@keyframes bookDetailsFadeIn {
+
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+
+}
+
+
+@keyframes bookDetailsSlideUp {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 1100px) {
+
+  .book-details-copy-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+
+/* ========================================
+   TABLET
+======================================== */
+
+@media (max-width: 900px) {
+
+  .book-details-modal {
+    grid-template-columns:
+      230px minmax(0, 1fr);
+  }
+
+
+  .book-details-left {
+    padding: 25px 18px;
+  }
+
+
+  .book-details-cover {
+    width: 170px;
+
+    height: 250px;
+  }
+
+
+  .book-details-cover img,
+  .book-details-cover-placeholder {
+    width: 155px;
+
+    height: 235px;
+  }
+
+
+  .book-details-main {
+    padding: 32px 25px;
+  }
+
+
+  .book-details-meta {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+
+  .book-details-copy-grid {
+    grid-template-columns:
+      repeat(3, 1fr);
+  }
+
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 650px) {
+
+  .book-details-backdrop {
+    padding: 12px;
+  }
+
+
+  .book-details-modal {
+    max-height:
+      calc(100vh - 24px);
+
+    grid-template-columns: 1fr;
+  }
+
+
+  .book-details-left {
+    padding: 25px;
+  }
+
+
+  .book-details-cover {
+    width: 150px;
+
+    height: 210px;
+
+    margin-bottom: 18px;
+  }
+
+
+  .book-details-cover img,
+  .book-details-cover-placeholder {
+    width: 140px;
+
+    height: 205px;
+  }
+
+
+  .book-details-main {
+    padding: 25px;
+  }
+
+
+  .book-details-heading h2 {
+    font-size: 32px;
+  }
+
+
+  .book-details-meta {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+
+  .book-details-copy-grid {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+
+  .book-details-section-heading {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+}

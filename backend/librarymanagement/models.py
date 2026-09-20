@@ -40,7 +40,8 @@ class Book(models.Model):
     publisher=models.CharField(max_length=100)
     category=models.CharField(choices=CATEGORY_CHOICES,max_length=100)
     language=models.CharField(choices=LANGUAGE_CHOICES,max_length=100)
-    
+    def __str__(self):
+            return self.title
 class BookCopy(models.Model):
     STATUS_CHOICES=[
         ("AVAILABLE", "AVAILABLE"),
@@ -53,9 +54,16 @@ class BookCopy(models.Model):
     book=models.ForeignKey(Book,on_delete=models.CASCADE)
     copy_number=models.IntegerField()
     status=models.CharField(choices=STATUS_CHOICES,max_length=100)
-
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["book", "copy_number"],
+                name="unique_book_copy_number"
+            )
+        ]
 class Member(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
+
     
 class BorrowRecord(models.Model):
     BORROW_STATUS_CHOICES = [

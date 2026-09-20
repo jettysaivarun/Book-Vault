@@ -12,6 +12,36 @@ class BookView(viewsets.ModelViewSet):
     serializer_class=BookSerializer
     filter_backends=[filters.SearchFilter]
     search_fields=["title","author","publisher","isbn","category","language"]
+    def get_book_data(self,book):
+        serializer=self.get_serializer(book)
+        data=serializer.data
+        copies=BookCopy.objects.filter(book=book)
+        data["copy_counts"]={
+            "available":copies.filter(status="AVAILABLE").count(),
+            "borrowed":copies.filter(status="BORROWED").count(),
+            "reserved":copies.filter(status="RESERVED").count(),
+            "lost":copies.filter(status="LOST").count(),
+            "damaged":copies.filter(status="DAMAGED").count(),
+            "total":copies.count(),
+        }
+        return data
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(
+            self.get_queryset()
+        )
+
+        data = [
+            self.get_book_data(book)
+            for book in queryset
+        ]
+
+        return Response(data)
+    def retrieve(self, request, *args, **kwargs):
+        book = self.get_object()
+
+        return Response(
+            self.get_book_data(book)
+        )
     @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
     def update_book_of_the_day(self,request): 
         try:

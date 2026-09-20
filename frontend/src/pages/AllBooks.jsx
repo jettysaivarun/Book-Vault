@@ -15,6 +15,7 @@ RotateCcw,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import BookDetails from './BookDetails'
 import './AllBooks.css'
 
 function AllBooks() {
@@ -27,6 +28,8 @@ const [error, setError] = useState('')
 const [search, setSearch] = useState('')
 const [category, setCategory] = useState('ALL')
 const [language, setLanguage] = useState('ALL')
+
+const [selectedBook, setSelectedBook] = useState(null)
 
 const username =
 localStorage.getItem('username') || 'Ketan'
@@ -93,6 +96,21 @@ if (image.startsWith('/')) {
 return `http://127.0.0.1:8000/media/${image}`
 
 
+}
+const handleViewDetails = async (book) => {
+  try {
+    const response = await api.get(
+      `/api/librarymanagement/books/${book.id}/`
+    )
+
+    setSelectedBook(response.data)
+
+  } catch (error) {
+    console.error(
+      'Failed to load book details:',
+      error
+    )
+  }
 }
 
 const categories = [
@@ -732,6 +750,7 @@ return ( <main className="all-books-page">
               <button
                 type="button"
                 className="all-book-button"
+                onClick={() => handleViewDetails(book)}
               >
 
                 <span>
@@ -770,6 +789,13 @@ return ( <main className="all-books-page">
       </div>
 
     )}
+    {selectedBook && (
+  <BookDetails
+    book={selectedBook}
+    imageUrl={getBookImage(selectedBook.image)}
+    onClose={() => setSelectedBook(null)}
+  />
+)}
 
   </section>
 
