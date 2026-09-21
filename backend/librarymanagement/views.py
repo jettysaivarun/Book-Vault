@@ -93,41 +93,47 @@ class BorrowRecordView(viewsets.ModelViewSet):
         book_copy.save()
         serializer=self.get_serializer(borrow_record)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
-    @action(detail=False,methods=['get','post'],permission_classes=[IsAdminUser])
-    def accept_request(self,request):
-        if request.method=='GET':
-            pending_records=BorrowRecord.objects.filter(status="PENDING")
-            serializer=self.get_serializer(pending_records,many=True)
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        elif request.method=='POST':
-            copy_id=request.data.get('copy_id')
+    @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
+    def borrow_accept_request(self,request):
+        copy_id=request.data.get('copy_id')
             
-            try:
-                borrow_record=BorrowRecord.objects.get(id=copy_id,status='PENDING')
-            except BorrowRecord.DoesNotExist:
-                return Response({"error":"The above record doesn't found"},status=status.HTTP_404_BAD_REQUEST)
-            borrow_record.status="ACTIVE"
-            days=int(request.data.get("days_to_return",14))
-            borrow_record.exp_return=date.today()+timedelta(days=days)
-            borrow_record.save()
-            book_copy=borrow_record.book_copy
-            book_copy.status="BORROWED"
-            book_copy.save()
-            serializer=self.get_serializer(borrow_record)
-            return Response(serializer.data,status=status.HTTP_200_OK)
+        try:
+            borrow_record=BorrowRecord.objects.get(id=copy_id,status='PENDING')
+        except BorrowRecord.DoesNotExist:
+            return Response({"error":"The above record doesn't found"},status=status.HTTP_404_BAD_REQUEST)
+        borrow_record.status="ACTIVE"
+        days=int(request.data.get("days_to_return",14))
+        borrow_record.exp_return=date.today()+timedelta(days=days)
+        borrow_record.save()
+        book_copy=borrow_record.book_copy
+        book_copy.status="BORROWED"
+        book_copy.save()
+        serializer=self.get_serializer(borrow_record)
+        return Response(serializer.data,status=status.HTTP_200_OK)
     @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
     def return_book(self,request):
         copy_id=request.data.get('copy_id')
         try:
-            borrow_record=BorrowRecord.objects.get(id=copy_id)
+            borrow_record=BorrowRecord.objects.get(id=copy_id,book_copy__status="BORROWED")
         except BorrowRecord.DoesNotExist:
             return Response({"error":"Active borrow record not found"},status=status.HTTP_404_NOT_FOUND)
+        borrow_record.status="PENDING"
+        borrow_record.save()
+        serializer=self.get_serializer(borrow_record)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
+    def return_accept_request(self,request):
+        copy_id=request.data.get('copy_id')
+        try:
+            borrow_record=BorrowRecord.objects.get(id=copy_id,status="PENDING")
+        except BorrowRecord.DoesNotExist:
+            return Response({"error":"No return request available"})
         borrow_record.act_return=date.today()
         days=(borrow_record.act_return-borrow_record.exp_return).days
         if days>0:
             borrow_record.fine_amount=days*5
             borrow_record.fine_remaining=borrow_record.fine_amount
-            borrow_record.status="RETURNED"
+        borrow_record.status="RETURNED"
         book_copy=borrow_record.book_copy
         book_copy.status="AVAILABLE"
         borrow_record.save()
