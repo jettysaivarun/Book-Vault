@@ -1,12 +1,13 @@
 from rest_framework import generics
-from .models import Reservation
-from .serializers import ReservationSerializer
+from .models import Reservation,Notifications
+from .serializers import ReservationSerializer,NotificationSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from datetime import datetime,timedelta
 from librarymanagement.models import BookCopy,Book
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.views import APIView
 
 # Create your views here.
 
@@ -39,3 +40,35 @@ class ReservationView(generics.CreateAPIView):
                 serializer=ReservationSerializer(reservation)
                 return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response({"message":"This book copies are not available in this date"},status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotificationListView(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def get(self,request):
+        notifications=Notifications.objects.filter(recipient=request.user)
+        serializer=NotificationSerializer(notifications,many=True)
+        return Response(serializer.data)
+    
+class MarkNotificationReadView(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def patch(self,request,pk):
+        notification=Notifications.objects.get(id=pk,recipient=request.user)
+        notification.is_read=True
+        notification.save()
+        return Response({"message":"The Notification is marked as read"})
+
+class UnreadNotifications(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def get(self,request):
+        count=Notifications.objects.filter(recipient=request.user,is_read=False).count()
+        return Response({"unread_count":count})
+
+class MarkAll(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def patch(self,request):
+        Notifications.objects.filter(recipient=request.user,is_read=False).update(is_read=True)
+        return Response({"message":"Every msg marked as read"})

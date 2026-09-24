@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import login
 from librarymanagement.models import Member
+from notifications.models import Notifications
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated,AllowAny
 # Create your views here.
@@ -17,6 +18,7 @@ class RegistrationView(generics.CreateAPIView):
         refresh=RefreshToken.for_user(user)
         access=refresh.access_token
         Member.objects.create(user=user)
+        Notifications.objects.create(recipient=user,title="Registration Completed",message=f"Your Registration have been completed successfully")
         return Response({
             "username":user.username,
             "email":user.email,
