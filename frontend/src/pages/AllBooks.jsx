@@ -6,7 +6,6 @@ BookOpen,
 Library,
 FileText,
 Settings,
-Bell,
 Leaf,
 ArrowRight,
 Search,
@@ -17,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import BookDetails from './BookDetails'
 import './AllBooks.css'
+import NotificationBell from '../components/NotificationBell'
 
 function AllBooks() {
 const navigate = useNavigate()
@@ -304,18 +304,7 @@ return ( <main className="all-books-page">
 
       <div className="all-books-user-area">
 
-        <button
-          type="button"
-          className="dashboard-notification"
-        >
-          <Bell
-            size={22}
-            strokeWidth={1.7}
-          />
-
-          <span />
-
-        </button>
+        <NotificationBell />
 
         <div className="dashboard-user">
 

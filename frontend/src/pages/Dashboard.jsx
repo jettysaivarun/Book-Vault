@@ -8,11 +8,11 @@ import {
   Library,
   FileText,
   Settings,
-  Bell,
   Leaf,
   ArrowRight,
 } from 'lucide-react'
 import api from '../services/api'
+import NotificationBell from '../components/NotificationBell'
 import './Dashboard.css'
 
 function Dashboard() {
@@ -217,19 +217,7 @@ function Dashboard() {
 
           <div className="dashboard-user-area">
 
-            <button
-              type="button"
-              className="dashboard-notification"
-            >
-
-              <Bell
-                size={22}
-                strokeWidth={1.7}
-              />
-
-              <span />
-
-            </button>
+            <NotificationBell />
 
 
             <div className="dashboard-user">
