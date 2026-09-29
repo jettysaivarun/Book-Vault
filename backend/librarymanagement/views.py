@@ -90,10 +90,10 @@ class BorrowRecordView(viewsets.ModelViewSet):
             member=Member.objects.get(user=request.user)
         except Member.DoesNotExist:
             return Response({"error":"The member doesn't exists"},status=status.HTTP_404_NOT_FOUND)
-        borrow_record=BorrowRecord.objects.create(book_copy=book_copy,member=member,status='PENDING')
-        book_copy.status='RESERVED'
+        borrow_record=BorrowRecord.objects.create(book_copy=book_copy,member=member,status='BORROW PENDING')
+        
         book_copy.save()
-        Notifications.objects.create(recipient=request.user,title="Book Borrowed",message=f"Borrow request of {book_copy.book.title} is send to librarian")
+        Notifications.objects.create(recipient=request.user,title="Book Borrow Request",message=f"Borrow request of {book_copy.book.title} is send to librarian")
         serializer=self.get_serializer(borrow_record)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
@@ -101,7 +101,7 @@ class BorrowRecordView(viewsets.ModelViewSet):
         copy_id=request.data.get('copy_id')
             
         try:
-            borrow_record=BorrowRecord.objects.get(id=copy_id,status='PENDING')
+            borrow_record=BorrowRecord.objects.get(id=copy_id,status='BORROW PENDING')
         except BorrowRecord.DoesNotExist:
             return Response({"error":"The above record doesn't found"},status=status.HTTP_404_BAD_REQUEST)
         borrow_record.status="ACTIVE"
@@ -119,10 +119,10 @@ class BorrowRecordView(viewsets.ModelViewSet):
     def return_book(self,request):
         copy_id=request.data.get('copy_id')
         try:
-            borrow_record=BorrowRecord.objects.get(id=copy_id,book_copy__status="BORROWED")
+            borrow_record=BorrowRecord.objects.get(id=copy_id,member__user=request.user,book_copy__status="BORROWED")
         except BorrowRecord.DoesNotExist:
             return Response({"error":"Active borrow record not found"},status=status.HTTP_404_NOT_FOUND)
-        borrow_record.status="PENDING"
+        borrow_record.status="RETURN PENDING"
         borrow_record.save()
         Notifications.objects.create(recipient=request.user,title="Return Book Request sent",message=f"The return request for {borrow_record.book_copy.book.title} was sent")
         serializer=self.get_serializer(borrow_record)
@@ -131,7 +131,7 @@ class BorrowRecordView(viewsets.ModelViewSet):
     def return_accept_request(self,request):
         copy_id=request.data.get('copy_id')
         try:
-            borrow_record=BorrowRecord.objects.get(id=copy_id,status="PENDING")
+            borrow_record=BorrowRecord.objects.get(id=copy_id,status="RETURN PENDING")
         except BorrowRecord.DoesNotExist:
             return Response({"error":"No return request available"})
         borrow_record.act_return=date.today()

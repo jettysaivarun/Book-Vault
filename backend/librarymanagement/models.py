@@ -31,7 +31,7 @@ class Book(models.Model):
         ("FRENCH", "FRENCH"),
         ("GERMAN", "GERMAN"),
     ]
-    id=models.IntegerField(unique=True,primary_key=True)
+    
     image=models.ImageField(upload_to="book_images/",null=True,blank=True)
     is_book_of_the_day=models.BooleanField(default=False)
     title=models.CharField(max_length=100)
@@ -50,7 +50,7 @@ class BookCopy(models.Model):
         ("LOST", "LOST"),
         ("DAMAGED", "DAMAGED"),
     ]
-    id=models.IntegerField(unique=True,primary_key=True)
+    
     book=models.ForeignKey(Book,on_delete=models.CASCADE)
     copy_number=models.IntegerField()
     status=models.CharField(choices=STATUS_CHOICES,max_length=100)
@@ -67,13 +67,14 @@ class Member(models.Model):
     
 class BorrowRecord(models.Model):
     BORROW_STATUS_CHOICES = [
-        ("PENDING","PENDING"),
+        ("BORROW PENDING","BORROW PENDING"),
+        ("RETURN PENDING","RETURN PENDING"),
         ("ACTIVE", "ACTIVE"),
         ("RETURNED", "RETURNED"),
         ("LOST", "LOST"),
         ("DAMAGED", "DAMAGED"),
     ]
-    id=models.IntegerField(unique=True,primary_key=True)
+    
     book_copy=models.ForeignKey(BookCopy,on_delete=models.CASCADE)
     member=models.ForeignKey(Member,on_delete=models.CASCADE)
     date=models.DateField(auto_now=True)
