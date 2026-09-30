@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   Loader2,
+  Clock,
 } from 'lucide-react'
 
 import api from '../services/api'
@@ -44,6 +45,10 @@ function BookDetails({ book, imageUrl, onClose }) {
 
   const [borrowRecordId, setBorrowRecordId] =
     useState(null)
+  const [borrowDays, setBorrowDays] = useState('')
+  const [returnDate, setReturnDate] = useState('')
+  const [borrowFee, setBorrowFee] = useState(0)
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
 
   /* ========================================
@@ -69,6 +74,10 @@ function BookDetails({ book, imageUrl, onClose }) {
     setBorrowConfirmation(false)
 
     setSelectedCopy(null)
+    setBorrowDays('')
+    setReturnDate('')
+    setBorrowFee(0)
+    setTermsAccepted(false)
 
     /*
       Check whether this browser already has
@@ -150,6 +159,44 @@ function BookDetails({ book, imageUrl, onClose }) {
   /* ========================================
      FIND AVAILABLE COPY
   ======================================== */
+  const handleBorrowDaysChange = (event) => {
+  const value = event.target.value
+
+  if (value === '') {
+    setBorrowDays('')
+    setReturnDate('')
+    setBorrowFee(0)
+    setBorrowError('')
+    return
+  }
+
+  const days = Number(value)
+
+  if (!Number.isInteger(days) || days < 1) {
+  setBorrowError('Please enter at least 1 day.')
+  return
+}
+
+  if (days > 14) {
+    setBorrowError('You can borrow a book for a maximum of 14 days.')
+    return
+  }
+
+  const today = new Date()
+  const calculatedDate = new Date(today)
+  calculatedDate.setDate(today.getDate() + days)
+
+  const formattedDate = calculatedDate.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+
+  setBorrowDays(days)
+  setReturnDate(formattedDate)
+  setBorrowFee(days * 5)
+  setBorrowError('')
+}
 
   const handleBorrowClick = async () => {
 
@@ -415,12 +462,18 @@ function BookDetails({ book, imageUrl, onClose }) {
        the latest backend state.
     ======================================== */
 
-    const response = await api.post(
-      '/api/librarymanagement/borrow/borrow_record/',
-      {
-        copy_id: latestSelectedCopy.id,
-      }
-    )
+    if (borrowDays === '') {
+  setBorrowError('Please enter the number of days.')
+  return
+}
+
+const response = await api.post(
+  '/api/librarymanagement/borrow/borrow_record/',
+  {
+    copy_id: latestSelectedCopy.id,
+    days_to_return: Number(borrowDays),
+  }
+)
 
 
     console.log(
@@ -576,18 +629,18 @@ function BookDetails({ book, imageUrl, onClose }) {
 }
 
 
-  /* ========================================
-     POLL BORROW REQUEST
+/* ========================================
+   POLL BORROW REQUEST
 
-     PENDING:
-       keep waiting
+   BORROW PENDING:
+     keep waiting
 
-     ACTIVE:
-       book successfully borrowed
+   ACTIVE:
+     book successfully borrowed
 
-     RETURNED / LOST / DAMAGED:
-       request is no longer active
-  ======================================== */
+   RETURNED / LOST / DAMAGED:
+     request is no longer active
+======================================== */
 
   useEffect(() => {
 
@@ -633,7 +686,7 @@ function BookDetails({ book, imageUrl, onClose }) {
         */
 
         if (
-          record.status === 'PENDING'
+          record.status === 'BORROW PENDING'
         ) {
 
           return
@@ -658,20 +711,16 @@ function BookDetails({ book, imageUrl, onClose }) {
           )
 
 
-          setCopyCounts((current) => ({
-
-            ...current,
-
-            reserved:
-              Math.max(
-                0,
-                (current.reserved ?? 0) - 1
-              ),
-
-            borrowed:
-              (current.borrowed ?? 0) + 1,
-
-          }))
+          setCopyCounts(
+  (current) => ({
+    ...current,
+    available:
+      Math.max(
+        0,
+        (current.available ?? 0) - 1
+      ),
+  })
+)
 
 
           /*
@@ -771,19 +820,20 @@ function BookDetails({ book, imageUrl, onClose }) {
 
   const cancelBorrow = () => {
 
-    if (borrowLoading) {
-      return
-    }
-
-    setBorrowConfirmation(false)
-
-    setSelectedCopy(null)
-
-    setBorrowError('')
-
-    setBorrowStatus('idle')
-
+  if (borrowLoading) {
+    return
   }
+
+  setBorrowConfirmation(false)
+  setSelectedCopy(null)
+  setBorrowError('')
+  setBorrowStatus('idle')
+  setBorrowDays('')
+  setReturnDate('')
+  setBorrowFee(0)
+  setTermsAccepted(false)
+
+}
 
 
   /* ========================================
@@ -1118,84 +1168,187 @@ function BookDetails({ book, imageUrl, onClose }) {
           ======================================== */}
 
           {borrowConfirmation &&
-            selectedCopy && (
+  selectedCopy && (
 
-            <div className="borrow-confirmation">
+  <div className="borrow-confirmation">
 
-              <div className="borrow-confirmation-icon">
+    <div className="borrow-confirmation-icon">
 
-                <BookOpen
-                  size={24}
-                />
+      <BookOpen
+        size={24}
+      />
 
-              </div>
+    </div>
 
+    <div className="borrow-confirmation-content">
 
-              <div className="borrow-confirmation-content">
+      <h3>
+        Borrow this book?
+      </h3>
 
-                <h3>
-                  Borrow this book?
-                </h3>
+      <p className="borrow-copy-info">
+        Copy #{selectedCopy.copy_number} is currently available.
+      </p>
 
-                <p>
-                  Copy #{selectedCopy.copy_number}
-                  {' '}
-                  is currently available.
-                </p>
+      <div className="borrow-days-section">
 
-                <span>
-                  Your request will be sent
-                  to the librarian for approval.
-                </span>
+        <label htmlFor="borrow-days">
+          Borrowing period
+        </label>
 
+        <div className="borrow-days-input-wrapper">
 
-                <div className="borrow-confirmation-actions">
+          <input
+            id="borrow-days"
+            type="number"
+            min="1"
+            max="14"
+            value={borrowDays}
+            onChange={handleBorrowDaysChange}
+            placeholder="Enter number of days"
+            disabled={borrowLoading}
+          />
 
-                  <button
-                    type="button"
-                    className="borrow-cancel-button"
-                    onClick={cancelBorrow}
-                    disabled={borrowLoading}
-                  >
-                    Cancel
-                  </button>
+          <span>
+            days
+          </span>
 
+        </div>
 
-                  <button
-                    type="button"
-                    className="borrow-confirm-button"
-                    onClick={confirmBorrow}
-                    disabled={borrowLoading}
-                  >
+        <small>
+          You can borrow this book for 1 to 14 days.
+        </small>
 
-                    {borrowLoading ? (
+      </div>
 
-                      <>
+      {returnDate && (
 
-                        <Loader2
-                          size={16}
-                          className="borrow-spinner"
-                        />
+  <div className="borrow-calculation">
 
-                        Sending Request...
+    <div className="borrow-calculation-row">
+      <span>
+        📅 Return by
+      </span>
 
-                      </>
+      <strong>
+        {returnDate}
+      </strong>
+    </div>
 
-                    ) : (
+    <div className="borrow-calculation-row">
+      <span>
+        💰 Borrowing fee
+      </span>
 
-                      'Send Borrow Request'
+      <strong>
+        ₹{borrowFee}
+      </strong>
+    </div>
 
-                    )}
+    <div className="borrow-calculation-row">
+      <span>
+        ⚠️ Late fine
+      </span>
 
-                  </button>
+      <strong>
+        ₹10 per extra day
+      </strong>
+    </div>
 
-                </div>
+  </div>
 
-              </div>
+)}
 
-            </div>
+<div className="borrow-rules">
+
+  <strong>Borrowing rules</strong>
+
+  <ul>
+    <li>Books can be borrowed for a maximum of 14 days.</li>
+    <li>The borrowing fee is ₹5 per day.</li>
+    <li>A late fine of ₹10 per extra day will apply.</li>
+    <li>The book must be returned in good condition.</li>
+  </ul>
+
+</div>
+
+<div className="borrow-terms">
+
+  <label className="borrow-terms-label">
+
+    <input
+      type="checkbox"
+      checked={termsAccepted}
+      onChange={(event) =>
+        setTermsAccepted(event.target.checked)
+      }
+      disabled={borrowLoading}
+    />
+
+    <span className="borrow-custom-checkbox"></span>
+
+    <span className="borrow-terms-text">
+      I agree to the Terms and Conditions.
+    </span>
+
+  </label>
+
+</div>
+
+      <span className="borrow-request-note">
+        Your request will be sent to the librarian for approval.
+      </span>
+
+      <div className="borrow-confirmation-actions">
+
+        <button
+          type="button"
+          className="borrow-cancel-button"
+          onClick={cancelBorrow}
+          disabled={borrowLoading}
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          className="borrow-confirm-button"
+          onClick={confirmBorrow}
+          disabled={
+            borrowLoading ||
+            borrowDays === '' ||
+            !termsAccepted
+          }
+        >
+
+          {borrowLoading ? (
+
+            <>
+
+              <Loader2
+                size={16}
+                className="borrow-spinner"
+              />
+
+              Sending Request...
+
+            </>
+
+          ) : (
+
+            'Accept & Send Request'
 
           )}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 
 
           {/* ========================================
@@ -1207,13 +1360,10 @@ function BookDetails({ book, imageUrl, onClose }) {
             <div className="borrow-pending">
 
               <div className="borrow-pending-icon">
-
-                <Loader2
-                  size={24}
-                  className="borrow-spinner"
-                />
-
-              </div>
+  <Clock
+    size={22}
+  />
+</div>
 
 
               <div>

@@ -144,16 +144,17 @@ function Dashboard() {
 
 
           <button
-            type="button"
-            className="dashboard-nav-item"
-          >
-            <Library
-              size={21}
-              strokeWidth={1.8}
-            />
+  type="button"
+  className="dashboard-nav-item"
+  onClick={() => navigate('/my-books')}
+>
+  <Library
+    size={21}
+    strokeWidth={1.8}
+  />
 
-            <span>My Books</span>
-          </button>
+  <span>My Books</span>
+</button>
 
 
           <button
@@ -170,9 +171,10 @@ function Dashboard() {
 
 
           <button
-            type="button"
-            className="dashboard-nav-item"
-          >
+  type="button"
+  className="dashboard-nav-item"
+  onClick={() => navigate('/settings')}
+>
             <Settings
               size={21}
               strokeWidth={1.8}

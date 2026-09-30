@@ -34,12 +34,10 @@ const [selectedBook, setSelectedBook] = useState(null)
 const username =
 localStorage.getItem('username') || 'Ketan'
 
-useEffect(() => {
 const fetchBooks = async () => {
-try {
-setLoading(true)
-setError('')
-
+  try {
+    setLoading(true)
+    setError('')
 
     const response = await api.get(
       '/api/librarymanagement/books/'
@@ -47,25 +45,30 @@ setError('')
 
     setBooks(response.data)
   } catch (error) {
-    console.error('Failed to fetch books:', error)
+    console.error('Failed to load books:', error)
 
     if (error.response?.status === 401) {
-      setError(
-        'Your session has expired. Please log in again.'
-      )
+      setError('Your session has expired. Please log in again.')
     } else {
-      setError(
-        'Unable to load the books. Please try again.'
-      )
+      setError('Unable to load books. Please try again.')
     }
   } finally {
     setLoading(false)
   }
 }
 
-fetchBooks()
+useEffect(() => {
+  fetchBooks()
 
+  const handleFocus = () => {
+    fetchBooks()
+  }
 
+  window.addEventListener('focus', handleFocus)
+
+  return () => {
+    window.removeEventListener('focus', handleFocus)
+  }
 }, [])
 
 const getBookImage = (image) => {
@@ -220,16 +223,17 @@ return ( <main className="all-books-page">
       </button>
 
       <button
-        type="button"
-        className="dashboard-nav-item"
-      >
-        <Library
-          size={21}
-          strokeWidth={1.8}
-        />
+  type="button"
+  className="dashboard-nav-item"
+  onClick={() => navigate('/my-books')}
+>
+  <Library
+    size={21}
+    strokeWidth={1.8}
+  />
 
-        <span>My Books</span>
-      </button>
+  <span>My Books</span>
+</button>
 
       <button
         type="button"
@@ -244,16 +248,17 @@ return ( <main className="all-books-page">
       </button>
 
       <button
-        type="button"
-        className="dashboard-nav-item"
-      >
-        <Settings
-          size={21}
-          strokeWidth={1.8}
-        />
+  type="button"
+  className="dashboard-nav-item"
+  onClick={() => navigate('/settings')}
+>
+  <Settings
+    size={21}
+    strokeWidth={1.8}
+  />
 
-        <span>Settings</span>
-      </button>
+  <span>Settings</span>
+</button>
 
     </nav>
 
@@ -778,14 +783,26 @@ return ( <main className="all-books-page">
       </div>
 
     )}
-    {selectedBook && (
+{selectedBook && (
   <BookDetails
     book={selectedBook}
     imageUrl={getBookImage(selectedBook.image)}
-    onClose={() => setSelectedBook(null)}
+    onClose={() => {
+      setSelectedBook(null)
+
+      api.get('/api/librarymanagement/books/')
+        .then((response) => {
+          setBooks(response.data)
+        })
+        .catch((error) => {
+          console.error(
+            'Failed to refresh books:',
+            error
+          )
+        })
+    }}
   />
 )}
-
   </section>
 
 </main>

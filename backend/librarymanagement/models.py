@@ -81,6 +81,7 @@ class BorrowRecord(models.Model):
     exp_return=models.DateField(null=True,blank=True)
     act_return=models.DateField(null=True,blank=True)
     status=models.CharField(choices=BORROW_STATUS_CHOICES,max_length=100)
+    borrow_fee=models.IntegerField(default=0)
     fine_amount=models.IntegerField(default=0)
     fine_amount_paid=models.IntegerField(default=0)
     fine_remaining=models.IntegerField(default=0)

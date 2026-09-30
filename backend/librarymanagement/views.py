@@ -77,6 +77,13 @@ class BookCopyView(viewsets.ModelViewSet):
 class BorrowRecordView(viewsets.ModelViewSet):
     queryset=BorrowRecord.objects.all()
     serializer_class=BorrowRecordSerializer
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return BorrowRecord.objects.all()
+
+        return BorrowRecord.objects.filter(
+            member__user=self.request.user
+        )
     @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
     def borrow_record(self,request):
         copy_id=request.data.get('copy_id')
@@ -90,8 +97,13 @@ class BorrowRecordView(viewsets.ModelViewSet):
             member=Member.objects.get(user=request.user)
         except Member.DoesNotExist:
             return Response({"error":"The member doesn't exists"},status=status.HTTP_404_NOT_FOUND)
-        borrow_record=BorrowRecord.objects.create(book_copy=book_copy,member=member,status='BORROW PENDING')
         
+        days=int(request.data.get("days_to_return",14))
+        if days<0:
+            return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+        if days>14:
+            return Response({"error":"You can't borrow a book more than 14 days"},status=status.HTTP_400_BAD_REQUEST)
+        borrow_record=BorrowRecord.objects.create(book_copy=book_copy,member=member,status='BORROW PENDING',exp_return=date.today()+timedelta(days=days),borrow_fee=days*5)
         book_copy.save()
         Notifications.objects.create(recipient=request.user,title="Book Borrow Request",message=f"Borrow request of {book_copy.book.title} is send to librarian")
         serializer=self.get_serializer(borrow_record)
@@ -105,8 +117,6 @@ class BorrowRecordView(viewsets.ModelViewSet):
         except BorrowRecord.DoesNotExist:
             return Response({"error":"The above record doesn't found"},status=status.HTTP_404_BAD_REQUEST)
         borrow_record.status="ACTIVE"
-        days=int(request.data.get("days_to_return",14))
-        borrow_record.exp_return=date.today()+timedelta(days=days)
         borrow_record.save()
         book_copy=borrow_record.book_copy
         book_copy.status="BORROWED"
@@ -137,11 +147,12 @@ class BorrowRecordView(viewsets.ModelViewSet):
         borrow_record.act_return=date.today()
         days=(borrow_record.act_return-borrow_record.exp_return).days
         if days>0:
-            borrow_record.fine_amount=days*5
+            borrow_record.fine_amount=days*10
             borrow_record.fine_remaining=borrow_record.fine_amount
         borrow_record.status="RETURNED"
         book_copy=borrow_record.book_copy
         book_copy.status="AVAILABLE"
+        book_copy.save()
         borrow_record.save()
         Notifications.objects.create(recipient=borrow_record.member.user,title="Return Request Accepted",message=f"Return Request for {borrow_record.book_copy.book.title} was accepted")
         Notifications.objects.create(recipient=request.user,title="Return Request",message=f"Return Request for {borrow_record.book_copy.book.title} was accepted")
