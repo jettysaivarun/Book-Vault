@@ -40,6 +40,7 @@ class Book(models.Model):
     publisher=models.CharField(max_length=100)
     category=models.CharField(choices=CATEGORY_CHOICES,max_length=100)
     language=models.CharField(choices=LANGUAGE_CHOICES,max_length=100)
+    ebook=models.FileField(upload_to="ebooks/",null=True,blank=True)
     def __str__(self):
             return self.title
 class BookCopy(models.Model):
