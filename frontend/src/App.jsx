@@ -12,6 +12,7 @@ import Dashboard from './pages/Dashboard'
 import AllBooks from './pages/AllBooks'
 import MyBooks from './pages/MyBooks'
 import Settings from './pages/Settings'
+import EBooks from './pages/Ebooks'
 
 function App() {
   return (
@@ -77,6 +78,10 @@ function App() {
 <Route
   path="/my-books"
   element={<MyBooks />}
+/>
+<Route
+  path="/ebooks"
+  element={<EBooks />}
 />
 
       </Routes>

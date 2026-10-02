@@ -266,9 +266,10 @@ function Settings() {
         </button>
 
         <button
-          type="button"
-          className="settings-nav-item"
-        >
+  type="button"
+  className="dashboard-nav-item"
+  onClick={() => navigate('/ebooks')}
+>
           <FileText
             size={21}
             strokeWidth={1.8}

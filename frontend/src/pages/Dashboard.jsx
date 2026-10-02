@@ -1,4 +1,4 @@
-
+import BookDetails from './BookDetails'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -18,6 +18,7 @@ const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function Dashboard() {
     const navigate = useNavigate()
   const [bookOfTheDay, setBookOfTheDay] = useState(null)
+  const [selectedBook, setSelectedBook] = useState(null)
   const [loadingBook, setLoadingBook] = useState(true)
   const [bookError, setBookError] = useState('')
 
@@ -157,10 +158,11 @@ function Dashboard() {
 </button>
 
 
-          <button
-            type="button"
-            className="dashboard-nav-item"
-          >
+         <button
+  type="button"
+  className="dashboard-nav-item"
+  onClick={() => navigate('/ebooks')}
+>
             <FileText
               size={21}
               strokeWidth={1.8}
@@ -519,9 +521,10 @@ function Dashboard() {
 
 
                 <button
-                  type="button"
-                  className="book-details-button"
-                >
+  type="button"
+  className="book-details-button"
+  onClick={() => setSelectedBook(bookOfTheDay)}
+>
 
                   <span>
                     View Details
@@ -696,6 +699,15 @@ function Dashboard() {
           </div>
 
         </motion.section>
+        {selectedBook && (
+  <BookDetails
+    book={selectedBook}
+    imageUrl={getBookImage(selectedBook.image)}
+    onClose={() => {
+      setSelectedBook(null)
+    }}
+  />
+)}
 
       </section>
 
