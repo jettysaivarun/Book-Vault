@@ -17,7 +17,7 @@ import api from '../services/api'
 import BookDetails from './BookDetails'
 import './AllBooks.css'
 import NotificationBell from '../components/NotificationBell'
-
+const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function AllBooks() {
 const navigate = useNavigate()
 
@@ -93,10 +93,10 @@ if (
 }
 
 if (image.startsWith('/')) {
-  return `http://127.0.0.1:8000${image}`
+  return `${API_URL}${image}`
 }
 
-return `http://127.0.0.1:8000/media/${image}`
+return `${API_URL}/media/${image}`
 
 
 }

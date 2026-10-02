@@ -14,7 +14,7 @@ import {
 import api from '../services/api'
 import NotificationBell from '../components/NotificationBell'
 import './Dashboard.css'
-
+const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function Dashboard() {
     const navigate = useNavigate()
   const [bookOfTheDay, setBookOfTheDay] = useState(null)
@@ -83,10 +83,10 @@ function Dashboard() {
   }
 
   if (image.startsWith('/')) {
-    return `http://127.0.0.1:8000${image}`
+    return `${API_URL}${image}`
   }
 
-  return `http://127.0.0.1:8000/media/${image}`
+  return `${API_URL}/media/${image}`
 }
 
   return (

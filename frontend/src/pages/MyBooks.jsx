@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import NotificationBell from '../components/NotificationBell'
 import './MyBooks.css'
-
+const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function MyBooks() {
   const navigate = useNavigate()
 
@@ -85,10 +85,10 @@ function MyBooks() {
     }
 
     if (image.startsWith('/')) {
-      return `http://127.0.0.1:8000${image}`
+      return `${API_URL}${image}`
     }
 
-    return `http://127.0.0.1:8000/media/${image}`
+    return `${API_URL}/media/${image}`
   }
 
   const getBookForRecord = (record) => {

@@ -27,7 +27,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import NotificationBell from '../components/NotificationBell'
 import { logout } from '../services/api'
 import './Settings.css'
-
+const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function Settings() {
   const navigate = useNavigate()
   const location = useLocation()
