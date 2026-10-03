@@ -64,7 +64,7 @@ class CheckUsernameView(generics.CreateAPIView):
         )
         
 class LogoutView(APIView):
-    permission_classes=[AllowAny]
+    permission_classes=[IsAuthenticated]
     def post(self,request):
         refresh_token=request.data.get('refresh_token')
         token=RefreshToken(refresh_token)
@@ -103,3 +103,15 @@ class ChangePasswordView(APIView):
         user.save()
         Notifications.objects.create(recipient=user,title="Password Changed",message="Your password was changed Successfully")
         return Response({"message":"Your Password was Changed Successfully"})
+
+class DeleteAccountView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        password=request.data.get('password')
+        if not password:
+            return Response({"error":"Password is Reqiured"},status=status.HTTP_400_BAD_REQUEST)
+        user=request.user
+        if not user.check_password(password):
+            return Response({"error":"Password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
+        user.delete()
+        return Response({"message":"Account deleted successfully"},status=status.HTTP_200_OK)

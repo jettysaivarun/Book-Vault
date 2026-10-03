@@ -7,4 +7,5 @@ urlpatterns=[
     path("logout/",views.LogoutView.as_view()),
     path("change_username/",views.ChangeUsernameView.as_view()),
     path("change_password/",views.ChangePasswordView.as_view()),
+    path("delete_acc/",views.DeleteAccountView.as_view()),
 ]
