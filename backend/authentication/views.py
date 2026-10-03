@@ -71,3 +71,35 @@ class LogoutView(APIView):
         token.blacklist()
         return Response({"message":"Logged Out Successful"})
     
+    
+class ChangeUsernameView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        new_name=request.data.get('new_name')
+        if not new_name:
+            return Response({"message":"Username required"},status=status.HTTP_400_BAD_REQUEST)
+        user=request.user
+        if User.objects.filter(username=new_name).exists():
+            return Response({"error":"This username already exists"})
+        
+        user.username=new_name
+        user.save()
+        Notifications.objects.create(recipient=user,title="Username updated",message=f"Your username was updated as {user.username}")
+        return Response({"message":"Username changed"})
+    
+class ChangePasswordView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        old_pass=request.data.get('old_pass')
+        new_pass=request.data.get('new_pass')
+        if not new_pass or not old_pass:
+            return Response({"error":"New password and Old password are required"},status=status.HTTP_400_BAD_REQUEST)
+        user=request.user
+        if not user.check_password(old_pass):
+            return Response({"error":"The password doesn't match to your current password"},status=status.HTTP_400_BAD_REQUEST)
+        if len(new_pass)<8 or new_pass.isalnum():
+            return Response({"error":"Your new password should consists of minimum 8 characters and one special character"})
+        user.set_password(new_pass)
+        user.save()
+        Notifications.objects.create(recipient=user,title="Password Changed",message="Your password was changed Successfully")
+        return Response({"message":"Your Password was Changed Successfully"})
