@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import api from '../services/api'
 import NotificationBell from '../components/NotificationBell'
-import './EBooks.css'
+import './Ebooks.css'
 
 function EBooks() {
   const navigate = useNavigate()
