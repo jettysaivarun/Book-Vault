@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from cloudinary.models import CloudinaryField
 # Create your models here.
 class Book(models.Model):
     CATEGORY_CHOICES = [
@@ -32,7 +33,7 @@ class Book(models.Model):
         ("GERMAN", "GERMAN"),
     ]
     
-    image=models.ImageField(upload_to="book_images/",null=True,blank=True)
+    image=CloudinaryField("image",folder="book_images/",null=True,blank=True)
     is_book_of_the_day=models.BooleanField(default=False)
     title=models.CharField(max_length=100)
     isbn=models.CharField(max_length=10,unique=True)
@@ -40,7 +41,7 @@ class Book(models.Model):
     publisher=models.CharField(max_length=100)
     category=models.CharField(choices=CATEGORY_CHOICES,max_length=100)
     language=models.CharField(choices=LANGUAGE_CHOICES,max_length=100)
-    ebook=models.FileField(upload_to="ebooks/",null=True,blank=True)
+    ebook=CloudinaryField("ebook",folder="ebooks",resource_type="raw",null=True,blank=True)
     def __str__(self):
             return self.title
 class BookCopy(models.Model):

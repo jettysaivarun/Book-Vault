@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import dj_database_url
 import dotenv
+import cloudinary
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,10 +24,15 @@ dotenv.load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-insecure-key-for-development')
-
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
@@ -46,9 +52,11 @@ INSTALLED_APPS = [
     "authentication",
     "librarymanagement",
     "notifications",
+    "payments",
     "rest_framework",
     "corsheaders", #frontend
     "rest_framework_simplejwt.token_blacklist",
+    "cloudinary",
 ]
 
 MIDDLEWARE = [
@@ -86,13 +94,23 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-    )
-}
-print("DATABASE ENGINE:", DATABASES["default"]["ENGINE"])
+
+
+if os.getenv("DATABASE_URL"):
+    DATABASES = {
+        "default": dj_database_url.parse(
+            os.getenv("DATABASE_URL"),
+            conn_max_age=600,
+        )
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -158,3 +176,4 @@ MEDIA_ROOT = BASE_DIR / "media"
 '''localStorage.removeItem('access_token')
 localStorage.removeItem('refresh_token')
 localStorage.removeItem('username')  for logout'''
+

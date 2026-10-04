@@ -9,6 +9,7 @@ urlpatterns = [
     path("api/token/refresh/",TokenRefreshView.as_view(),name="token_refresh"),
     path("api/librarymanagement/",include('librarymanagement.urls')),
     path("api/notifications/",include('notifications.urls')),
+    path("api/payments/",include('payments.urls')),
 ]
 
 if settings.DEBUG:
