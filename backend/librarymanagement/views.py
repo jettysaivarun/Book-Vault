@@ -105,7 +105,9 @@ class BorrowRecordView(viewsets.ModelViewSet):
             return Response({"error":"You can't borrow a book more than 14 days"},status=status.HTTP_400_BAD_REQUEST)
         borrow_record=BorrowRecord.objects.create(book_copy=book_copy,member=member,status='BORROW PENDING',exp_return=date.today()+timedelta(days=days),borrow_fee=days*5)
         book_copy.save()
-        Notifications.objects.create(recipient=request.user,title="Book Borrow Request",message=f"Borrow request of {book_copy.book.title} is send to librarian")
+        
+        if member.borrow_updates:
+            Notifications.objects.create(recipient=request.user,title="Book Borrow Request",message=f"Borrow request of {book_copy.book.title} is send to librarian")
         serializer=self.get_serializer(borrow_record)
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
@@ -121,8 +123,11 @@ class BorrowRecordView(viewsets.ModelViewSet):
         book_copy=borrow_record.book_copy
         book_copy.status="BORROWED"
         book_copy.save()
+        member=Member.objects.get(user=borrow_record.request.user)
+        
         Notifications.objects.create(recipient=request.user,title="Request Accepted",message=f"You accepted the  borrow request of {borrow_record.book_copy.book.title}")
-        Notifications.objects.create(recipient=borrow_record.member.user,title="Borrow Request Accepted",message=f"Your request for {borrow_record.book_copy.book.title} is accepted")
+        if member.borrow_updates:
+            Notifications.objects.create(recipient=borrow_record.member.user,title="Borrow Request Accepted",message=f"Your request for {borrow_record.book_copy.book.title} is accepted")
         serializer=self.get_serializer(borrow_record)
         return Response(serializer.data,status=status.HTTP_200_OK)
     @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
@@ -134,7 +139,9 @@ class BorrowRecordView(viewsets.ModelViewSet):
             return Response({"error":"Active borrow record not found"},status=status.HTTP_404_NOT_FOUND)
         borrow_record.status="RETURN PENDING"
         borrow_record.save()
-        Notifications.objects.create(recipient=request.user,title="Return Book Request sent",message=f"The return request for {borrow_record.book_copy.book.title} was sent")
+        member=Member.objects.get(user=request.user)
+        if member.return_updates:
+            Notifications.objects.create(recipient=request.user,title="Return Book Request sent",message=f"The return request for {borrow_record.book_copy.book.title} was sent")
         serializer=self.get_serializer(borrow_record)
         return Response(serializer.data,status=status.HTTP_200_OK)
     @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
@@ -154,7 +161,9 @@ class BorrowRecordView(viewsets.ModelViewSet):
         book_copy.status="AVAILABLE"
         book_copy.save()
         borrow_record.save()
-        Notifications.objects.create(recipient=borrow_record.member.user,title="Return Request Accepted",message=f"Return Request for {borrow_record.book_copy.book.title} was accepted")
+        member=Member.objects.get(user=borrow_record.member.user)
+        if member.return_updates:
+            Notifications.objects.create(recipient=borrow_record.member.user,title="Return Request Accepted",message=f"Return Request for {borrow_record.book_copy.book.title} was accepted")
         Notifications.objects.create(recipient=request.user,title="Return Request",message=f"Return Request for {borrow_record.book_copy.book.title} was accepted")
         serializer=self.get_serializer(borrow_record)
         return Response(serializer.data,status=status.HTTP_200_OK)

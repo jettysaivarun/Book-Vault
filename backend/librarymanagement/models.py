@@ -65,7 +65,8 @@ class BookCopy(models.Model):
         ]
 class Member(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
-
+    borrow_updates=models.BooleanField(default=True)
+    return_updates=models.BooleanField(default=True)
     
 class BorrowRecord(models.Model):
     BORROW_STATUS_CHOICES = [
