@@ -479,3 +479,238 @@
 .my-books-return-button:active {
   transform: translateY(0);
 }
+.my-books-return-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 17px;
+  background: #154b3d;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.my-books-return-button:hover {
+  background: #1d5d4c;
+  transform: translateY(-1px);
+}
+
+.my-books-return-button:active {
+  transform: translateY(0);
+}
+
+.my-books-return-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
+}
+
+.return-bill-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(18, 38, 31, 0.48);
+  backdrop-filter: blur(8px);
+}
+
+.return-bill-modal {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 32px;
+  border: 1px solid rgba(23, 63, 52, 0.1);
+  border-radius: 24px;
+  background: #fffdf9;
+  box-shadow:
+    0 30px 80px rgba(20, 46, 38, 0.2),
+    0 8px 25px rgba(20, 46, 38, 0.08);
+}
+
+.return-bill-close {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: #f0eee7;
+  color: #61736a;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.return-bill-close:hover {
+  background: #e7e4dc;
+  color: #24473b;
+}
+
+.return-bill-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.return-bill-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: #e7f0e8;
+  color: #275e4b;
+}
+
+.return-bill-eyebrow {
+  margin: 20px 0 5px;
+  color: #719080;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2.3px;
+}
+
+.return-bill-modal h2 {
+  margin: 0;
+  color: #173f34;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 34px;
+  font-weight: 500;
+}
+
+.return-bill-book {
+  margin: 7px 0 24px;
+  color: #7d8179;
+  font-size: 13px;
+}
+
+.return-bill-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 4px 0;
+  border-top: 1px solid rgba(23, 63, 52, 0.08);
+}
+
+.return-bill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(23, 63, 52, 0.07);
+}
+
+.return-bill-row span {
+  color: #777e77;
+  font-size: 12px;
+}
+
+.return-bill-row strong {
+  color: #3c574d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.return-bill-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 17px;
+  padding: 17px;
+  border-radius: 14px;
+  background: #edf4ed;
+}
+
+.return-bill-total span {
+  color: #47685a;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.return-bill-total strong {
+  color: #173f34;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.return-bill-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: #f9eeee;
+  color: #9b4d4d;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.return-bill-pay-button {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+  border: none;
+  border-radius: 12px;
+  background: #154b3d;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.return-bill-pay-button:hover {
+  background: #1d5d4c;
+  transform: translateY(-1px);
+}
+
+.return-bill-pay-button:active {
+  transform: translateY(0);
+}
+
+.return-bill-pay-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.return-bill-note {
+  margin: 13px 4px 0;
+  color: #98988f;
+  font-size: 9px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .return-bill-overlay {
+    padding: 15px;
+  }
+
+  .return-bill-modal {
+    padding: 25px 21px;
+    border-radius: 20px;
+  }
+
+  .return-bill-modal h2 {
+    font-size: 30px;
+  }
+}

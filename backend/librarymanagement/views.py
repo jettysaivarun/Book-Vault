@@ -117,13 +117,13 @@ class BorrowRecordView(viewsets.ModelViewSet):
         try:
             borrow_record=BorrowRecord.objects.get(id=copy_id,status='BORROW PENDING')
         except BorrowRecord.DoesNotExist:
-            return Response({"error":"The above record doesn't found"},status=status.HTTP_404_BAD_REQUEST)
+            return Response({"error":"The above record doesn't found"},status=status.HTTP_400_BAD_REQUEST)
         borrow_record.status="ACTIVE"
         borrow_record.save()
         book_copy=borrow_record.book_copy
         book_copy.status="BORROWED"
         book_copy.save()
-        member=Member.objects.get(user=borrow_record.request.user)
+        member=Member.objects.get(user=borrow_record.member.user)
         
         Notifications.objects.create(recipient=request.user,title="Request Accepted",message=f"You accepted the  borrow request of {borrow_record.book_copy.book.title}")
         if member.borrow_updates:

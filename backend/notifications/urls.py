@@ -8,4 +8,6 @@ urlpatterns=[
     path("unread_count/",views.UnreadNotifications.as_view()),
     path("markall/",views.MarkAll.as_view()),
     path("book_availability/",views.BookAvailabilityView.as_view()),
+    path("reservations/",views.ReservationListView.as_view()),
+    path("reservations/<int:pk>/borrow/",views.ReservationBorrowView.as_view()),
 ]

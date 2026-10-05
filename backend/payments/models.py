@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from librarymanagement.models import BorrowRecord
 # Create your models here.
 
 class Payment(models.Model):
@@ -12,6 +13,14 @@ class Payment(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
+    )
+
+    borrow_record = models.ForeignKey(
+    BorrowRecord,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="payments"
     )
 
     razorpay_order_id = models.CharField(

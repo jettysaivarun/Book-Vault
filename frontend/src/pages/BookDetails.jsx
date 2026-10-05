@@ -15,6 +15,8 @@ import {
 import api from '../services/api'
 
 import './BookDetails.css'
+import Reservation from './Reservations'
+
 const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 
 function BookDetails({ book, imageUrl, onClose }) {
@@ -49,7 +51,7 @@ function BookDetails({ book, imageUrl, onClose }) {
   const [returnDate, setReturnDate] = useState('')
   const [borrowFee, setBorrowFee] = useState(0)
   const [termsAccepted, setTermsAccepted] = useState(false)
-
+  const [showReservation, setShowReservation] = useState(false)
 
   /* ========================================
      COPY COUNTS
@@ -849,6 +851,15 @@ const response = await api.post(
     onClose()
 
   }
+  if (showReservation) {
+  return (
+    <Reservation
+      book={book}
+      onClose={() => setShowReservation(false)}
+      onSuccess={() => {}}
+    />
+  )
+}
 
 
   return (
@@ -1000,19 +1011,18 @@ const response = await api.post(
           ======================================== */}
 
           <button
-            type="button"
-            className="book-details-action"
-          >
+  type="button"
+  className="book-details-action"
+  onClick={() => setShowReservation(true)}
+>
+  <CalendarDays
+    size={20}
+  />
 
-            <CalendarDays
-              size={20}
-            />
-
-            <span>
-              Reserve Book
-            </span>
-
-          </button>
+  <span>
+    Reserve Book
+  </span>
+</button>
 
 
           {/* ========================================
