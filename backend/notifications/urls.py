@@ -7,4 +7,5 @@ urlpatterns=[
     path("notification_list/",views.NotificationListView.as_view()),
     path("unread_count/",views.UnreadNotifications.as_view()),
     path("markall/",views.MarkAll.as_view()),
+    path("book_availability/",views.BookAvailabilityView.as_view()),
 ]

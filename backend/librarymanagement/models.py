@@ -55,7 +55,7 @@ class BookCopy(models.Model):
     
     book=models.ForeignKey(Book,on_delete=models.CASCADE)
     copy_number=models.IntegerField()
-    status=models.CharField(choices=STATUS_CHOICES,max_length=100)
+    status=models.CharField(choices=STATUS_CHOICES,max_length=100,default="AVAILABLE")
     class Meta:
         constraints = [
             models.UniqueConstraint(
