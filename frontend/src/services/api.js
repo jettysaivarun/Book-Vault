@@ -151,12 +151,25 @@ LOGOUT
 ========================================
 */
 
-export const logout = () => {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('refresh_token')
-  localStorage.removeItem('username')
+export const logout = async () => {
+  const refreshToken = localStorage.getItem('refresh_token')
 
-  window.location.href = '/login'
+  try {
+    if (refreshToken) {
+      await api.post('/api/auth/logout/', {
+        refresh: refreshToken,
+      })
+    }
+  } catch (error) {
+    console.error('Logout request failed:', error)
+  } finally {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('username')
+    localStorage.removeItem('email')
+
+    window.location.href = '/login'
+  }
 }
 
 export default api

@@ -65,6 +65,7 @@ class BookCopy(models.Model):
         ]
 class Member(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
+    profile_picture=CloudinaryField("image",folder="profile/",null=True,blank=True)
     borrow_updates=models.BooleanField(default=True)
     return_updates=models.BooleanField(default=True)
     

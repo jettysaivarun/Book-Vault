@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect,useRef,useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Home,
@@ -25,7 +25,7 @@ import {
 } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import NotificationBell from '../components/NotificationBell'
-import { logout } from '../services/api'
+import api,{ logout } from '../services/api'
 import './Settings.css'
 const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function Settings() {
@@ -46,6 +46,10 @@ function Settings() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
+  const [deletePassword, setDeletePassword] = useState('')
+  const [showDeletePassword, setShowDeletePassword] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   const [showCurrentPassword, setShowCurrentPassword] =
     useState(false)
   const [showNewPassword, setShowNewPassword] =
@@ -54,11 +58,40 @@ function Settings() {
     useState(false)
 
   const [notifications, setNotifications] = useState({
-    dueDates: true,
-    borrowRequests: true,
-    returnRequests: true,
-    announcements: true,
-  })
+  borrowRequests: true,
+  returnRequests: true,
+})
+
+const [profilePicture, setProfilePicture] = useState(null)
+const [profilePreview, setProfilePreview] = useState(null)
+const profileInputRef = useRef(null)
+
+useEffect(() => {
+  const loadMemberData = async () => {
+    try {
+      const response = await api.get(
+        '/api/librarymanagement/members/current_member/'
+      )
+
+      setNotifications((previous) => ({
+        ...previous,
+        borrowRequests: response.data.borrow_updates,
+        returnRequests: response.data.return_updates,
+      }))
+
+      if (response.data.profile_picture) {
+        setProfilePicture(response.data.profile_picture)
+      }
+    } catch (error) {
+      console.error(
+        'Failed to load member data:',
+        error
+      )
+    }
+  }
+
+  loadMemberData()
+}, [])
 
   const path = location.pathname
 
@@ -120,28 +153,143 @@ function Settings() {
     },
   ]
 
-  const toggleNotification = (key) => {
+  
+const toggleNotification = async (key) => {
+  if (key !== 'borrowRequests' && key !== 'returnRequests') {
     setNotifications((previous) => ({
       ...previous,
       [key]: !previous[key],
     }))
+    return
   }
 
-  const handleUsernameUpdate = (event) => {
-    event.preventDefault()
+  const newValue = !notifications[key]
 
-    if (!newUsername.trim()) {
-      return
-    }
+  let endpoint
 
-    localStorage.setItem(
-      'username',
-      newUsername.trim()
+  if (key === 'borrowRequests') {
+    endpoint = newValue
+      ? '/api/librarymanagement/members/enable_borrow_notifications/'
+      : '/api/librarymanagement/members/disable_borrow_notifications/'
+  } else {
+    endpoint = newValue
+      ? '/api/librarymanagement/members/enable_return_notifications/'
+      : '/api/librarymanagement/members/disable_return_notifications/'
+  }
+
+  try {
+    await api.post(endpoint)
+
+    setNotifications((previous) => ({
+      ...previous,
+      [key]: newValue,
+    }))
+  } catch (error) {
+    console.error('Failed to update notification setting:', error)
+
+    alert(
+      error.response?.data?.error ||
+        'Unable to update notification setting.'
     )
+  }
+}
+
+const handleProfilePictureChange = async (event) => {
+  const file = event.target.files?.[0]
+
+  if (!file) {
+    return
+  }
+
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ]
+
+  if (!allowedTypes.includes(file.type)) {
+    alert('Please select a JPG, PNG or WEBP image.')
+    event.target.value = ''
+    return
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Profile picture must be smaller than 5MB.')
+    event.target.value = ''
+    return
+  }
+
+  const previewUrl = URL.createObjectURL(file)
+  setProfilePreview(previewUrl)
+
+  try {
+    const formData = new FormData()
+    formData.append('profile_picture', file)
+
+    const response = await api.patch(
+  '/api/librarymanagement/members/change_profile_pic/',
+  formData,
+  {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }
+)
+console.log('CURRENT MEMBER:', response.data)
+console.log('PROFILE URL:', response.data.profile_picture)
+
+    setProfilePicture(response.data.profile_picture || previewUrl)
+
+    alert('Profile picture updated successfully.')
+  } catch (error) {
+  console.error('Failed to update profile picture:', error)
+  console.log('Status:', error.response?.status)
+  console.log('Response:', error.response?.data)
+
+  setProfilePreview(null)
+
+  alert(
+    JSON.stringify(
+      error.response?.data ||
+        'No response from server'
+    )
+  )
+}
+
+  event.target.value = ''
+}
+
+
+
+  const handleUsernameUpdate = async (event) => {
+  event.preventDefault()
+
+  const usernameValue = newUsername.trim()
+
+  if (!usernameValue) {
+    return
+  }
+
+  try {
+    const response = await api.post('/api/auth/change_username/', {
+      new_name: usernameValue,
+    })
+
+    localStorage.setItem('username', response.data.username || usernameValue)
 
     setNewUsername('')
     window.location.reload()
+  } catch (error) {
+    console.error('Username update failed:', error)
+
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.detail ||
+      'Unable to update username. Please try again.'
+
+    alert(message)
   }
+}
 
   const handleEmailUpdate = (event) => {
     event.preventDefault()
@@ -160,21 +308,79 @@ function Settings() {
     setConfirmEmail('')
   }
 
-  const handlePasswordUpdate = (event) => {
-    event.preventDefault()
+  const handlePasswordUpdate = async (event) => {
+  event.preventDefault()
 
-    if (
-      !currentPassword ||
-      !newPassword ||
-      newPassword !== confirmPassword
-    ) {
-      return
-    }
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    alert('Please fill in all password fields.')
+    return
+  }
+
+  if (newPassword !== confirmPassword) {
+    alert('New passwords do not match.')
+    return
+  }
+
+  if (
+    newPassword.length < 8 ||
+    !/[^A-Za-z0-9]/.test(newPassword)
+  ) {
+    alert(
+      'New password must be at least 8 characters and contain at least one special character.'
+    )
+    return
+  }
+
+  try {
+    await api.post('/api/auth/change_password/', {
+      old_pass: currentPassword,
+      new_pass: newPassword,
+    })
+
+    alert('Password changed successfully.')
 
     setCurrentPassword('')
     setNewPassword('')
     setConfirmPassword('')
+  } catch (error) {
+    console.error('Password update failed:', error)
+
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.detail ||
+      'Unable to change password. Please try again.'
+
+    alert(message)
   }
+}
+  const handleDeleteAccount = async () => {
+  if (!deletePassword) {
+    alert('Please enter your password.')
+    return
+  }
+
+  try {
+    await api.post('/api/auth/delete_acc/', {
+      password: deletePassword,
+    })
+
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('username')
+    localStorage.removeItem('email')
+
+    window.location.href = '/login'
+  } catch (error) {
+    console.error('Account deletion failed:', error)
+
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.detail ||
+      'Unable to delete account. Please try again.'
+
+    alert(message)
+  }
+}
 
   const renderTopbar = () => (
     <header className="settings-topbar">
@@ -414,29 +620,46 @@ function Settings() {
       >
         <div className="settings-profile-photo-section">
           <div className="settings-profile-avatar">
-            {username.charAt(0).toUpperCase()}
+  {profilePreview || profilePicture ? (
+    <img
+      src={profilePreview || profilePicture}
+      alt="Profile"
+    />
+  ) : (
+    username.charAt(0).toUpperCase()
+  )}
 
-            <button
-              type="button"
-              className="settings-photo-edit"
-            >
-              <Pencil
-                size={16}
-                strokeWidth={2}
-              />
-            </button>
-          </div>
+  <button
+    type="button"
+    className="settings-photo-edit"
+    onClick={() => profileInputRef.current?.click()}
+  >
+    <Pencil
+      size={16}
+      strokeWidth={2}
+    />
+  </button>
+</div>
 
           <button
-            type="button"
-            className="settings-change-photo"
-          >
+  type="button"
+  className="settings-change-photo"
+  onClick={() => profileInputRef.current?.click()}
+>
+  
             <Pencil
               size={15}
               strokeWidth={1.8}
             />
             Change Photo
           </button>
+          <input
+  ref={profileInputRef}
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+  onChange={handleProfilePictureChange}
+  style={{ display: 'none' }}
+/>
 
           <p>
             JPG, PNG or WEBP. Max size 5MB.
@@ -814,15 +1037,7 @@ function Settings() {
           y: 0,
         }}
       >
-        <NotificationSetting
-          icon={CalendarDays}
-          title="Due Date Reminders"
-          description="Get reminded before your books are due"
-          enabled={notifications.dueDates}
-          onToggle={() =>
-            toggleNotification('dueDates')
-          }
-        />
+        
 
         <NotificationSetting
           icon={BookMarked}
@@ -852,19 +1067,7 @@ function Settings() {
           }
         />
 
-        <NotificationSetting
-          icon={Megaphone}
-          title="Library Announcements"
-          description="Get important updates from the library"
-          enabled={
-            notifications.announcements
-          }
-          onToggle={() =>
-            toggleNotification(
-              'announcements'
-            )
-          }
-        />
+        
       </motion.section>
     </>
   )
@@ -927,14 +1130,76 @@ function Settings() {
           </div>
 
           <button
-            type="button"
-            className="settings-delete-button"
-          >
-            <Trash2 size={17} />
-            Delete Account
-          </button>
+  type="button"
+  className="settings-delete-button"
+  onClick={() => setShowDeleteConfirm(true)}
+>
+  <Trash2 size={17} />
+  Delete Account
+</button>
         </div>
       </motion.section>
+      {showDeleteConfirm && (
+  <div className="settings-delete-modal">
+    <div className="settings-delete-modal-card">
+      <div className="settings-delete-icon">
+        <Trash2 size={24} />
+      </div>
+
+      <h3>Delete Account?</h3>
+
+      <p>
+        This action is permanent and cannot be undone.
+        Enter your current password to confirm.
+      </p>
+
+      <div className="settings-password-wrapper">
+        <input
+          type={showDeletePassword ? 'text' : 'password'}
+          placeholder="Enter your current password"
+          value={deletePassword}
+          onChange={(event) =>
+            setDeletePassword(event.target.value)
+          }
+        />
+
+        <button
+          type="button"
+          onClick={() =>
+            setShowDeletePassword(!showDeletePassword)
+          }
+        >
+          {showDeletePassword ? (
+            <EyeOff size={17} />
+          ) : (
+            <Eye size={17} />
+          )}
+        </button>
+      </div>
+
+      <div className="settings-delete-modal-actions">
+        <button
+          type="button"
+          className="settings-cancel-button"
+          onClick={() => {
+            setShowDeleteConfirm(false)
+            setDeletePassword('')
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          className="settings-confirm-delete-button"
+          onClick={handleDeleteAccount}
+        >
+          Delete Account
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </>
   )
 

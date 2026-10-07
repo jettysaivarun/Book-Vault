@@ -170,5 +170,51 @@ class BorrowRecordView(viewsets.ModelViewSet):
 class MemberView(viewsets.ModelViewSet):
     queryset=Member.objects.all()
     serializer_class=MemberSerializer
+    @action(detail=False,methods=['get'],permission_classes=[IsAuthenticated])
+    def current_member(self,request):
+        member=Member.objects.get(user=request.user)
+        serializer=self.get_serializer(member)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+    @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
+    def disable_borrow_notifications(self,request):
+        member=Member.objects.get(user=request.user)
+        if member.borrow_updates==True:
+            member.borrow_updates=False
+            member.save()
+        return Response({"message":"Disabled borrow notifications"})
     
-    
+    @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
+    def enable_borrow_notifications(self,request):
+        member=Member.objects.get(user=request.user)
+        if member.borrow_updates==False:
+            member.borrow_updates=True
+            member.save()
+            return Response({"message":"Enabled borrow notifications"},status=status.HTTP_200_OK)
+        return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
+    def disable_return_notifications(self,request):
+        member=Member.objects.get(user=request.user)
+        if member.return_updates==True:
+            member.return_updates=False      
+            member.save()
+            return Response({"message":"Disabled return notifications"},status=status.HTTP_200_OK)
+        return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False,methods=['post'],permission_classes=[IsAuthenticated])
+    def enable_return_notifications(self,request):
+        member=Member.objects.get(user=request.user)
+        if member.return_updates==False:
+            member.return_updates=True
+            member.save()
+            return Response({"message":"Enabled return notifications"},status=status.HTTP_200_OK)
+        return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False,methods=['patch'],permission_classes=[IsAuthenticated])
+    def change_profile_pic(self,request):
+        member=Member.objects.get(user=request.user)
+        image=request.FILES.get("profile_picture")
+        if not image:
+            return Response({"error":"Profile picture is required"},status=status.HTTP_400_BAD_REQUEST)
+        member.profile_picture=image
+        member.save()
+        return Response({"message":"Profile pic updated","profile_picture":member.profile_picture.url},status=status.HTTP_200_OK)
+        

@@ -975,3 +975,106 @@
     line-height: 1.4;
   }
 }
+.settings-delete-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(20, 30, 25, 0.45);
+  backdrop-filter: blur(5px);
+}
+
+.settings-delete-modal-card {
+  width: 100%;
+  max-width: 430px;
+  padding: 30px;
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 0 25px 70px rgba(20, 30, 25, 0.2);
+}
+
+.settings-delete-modal-card h3 {
+  margin: 18px 0 8px;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  color: #233f35;
+}
+
+.settings-delete-modal-card p {
+  margin: 0 0 22px;
+  color: #77857f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.settings-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.settings-password-wrapper input {
+  width: 100%;
+  height: 45px;
+  padding: 0 45px 0 14px;
+  border: 1px solid #d5ddd8;
+  border-radius: 9px;
+  outline: none;
+  font-family: inherit;
+}
+
+.settings-password-wrapper input:focus {
+  border-color: #175849;
+}
+
+.settings-password-wrapper button {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #718078;
+  cursor: pointer;
+}
+
+.settings-delete-modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.settings-cancel-button,
+.settings-confirm-delete-button {
+  flex: 1;
+  height: 43px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-cancel-button {
+  border: 1px solid #ccd5d0;
+  background: transparent;
+  color: #53635c;
+}
+
+.settings-confirm-delete-button {
+  border: 0;
+  background: #d9372c;
+  color: #fff;
+}
+
+.settings-confirm-delete-button:hover {
+  background: #c92d24;
+}
+.settings-profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
