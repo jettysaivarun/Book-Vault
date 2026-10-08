@@ -10,8 +10,10 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
+@csrf_exempt
 def create_admin(request):
     User = get_user_model()
 
