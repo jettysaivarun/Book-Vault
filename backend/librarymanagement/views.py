@@ -46,9 +46,10 @@ class BookView(viewsets.ModelViewSet):
     @action(detail=False,methods=['post'],permission_classes=[IsAdminUser])
     def update_book_of_the_day(self,request): 
         try:
-            prev_book=Book.objects.get(is_book_of_the_day=True)
-            prev_book.is_book_of_the_day=False
-            prev_book.save()
+            prev_book=Book.objects.filter(is_book_of_the_day=True).first()
+            if prev_book:
+                prev_book.is_book_of_the_day=False
+                prev_book.save()
         except Book.DoesNotExist:
             pass
                 
@@ -65,7 +66,7 @@ class BookView(viewsets.ModelViewSet):
     @action(detail=False,methods=['get'],permission_classes=[IsAuthenticated])
     def get_book_of_the_day(self,request):
         try:
-            book=Book.objects.get(is_book_of_the_day=True)
+            book=Book.objects.filter(is_book_of_the_day=True).first()
         except Book.DoesNotExist:
             return Response({"error":"No book is matched as book of the day"})
         serializer=self.get_serializer(book)
