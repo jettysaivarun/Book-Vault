@@ -168,11 +168,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://book-vault-frontend-sigma.vercel.app",
-    "https://7eaq52l1u-aikyam.vercel.app",
+    
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://book-vault-frontend-sigma.vercel.app",
-    "https://7eaq52l1u-aikyam.vercel.app",
+    
 ]
 
 MEDIA_URL = "/media/"
