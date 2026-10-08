@@ -8,7 +8,22 @@ from librarymanagement.models import Member
 from notifications.models import Notifications
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated,AllowAny
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+
 # Create your views here.
+def create_admin(request):
+    User = get_user_model()
+
+    if not User.objects.filter(username="admin").exists():
+        User.objects.create_superuser(
+            username="admin",
+            email="admin@gmail.com",
+            password="YourStrongPassword123"
+        )
+        return JsonResponse({"message": "Superuser created"})
+
+    return JsonResponse({"message": "Superuser already exists"})
 class RegistrationView(generics.CreateAPIView):
     serializer_class=RegistrationSerializer
     def create(self,request):
