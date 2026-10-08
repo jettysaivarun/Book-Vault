@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django-cors-headers = "*"
 pillow = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
@@ -16,6 +15,7 @@ cloudinary = "*"
 gunicorn = "*"
 django = "*"
 dotenv = "*"
+django-cors-headers = "*"
 
 [dev-packages]
 

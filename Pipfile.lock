@@ -504,14 +504,6 @@
             "markers": "python_version >= '3.10'",
             "version": "==0.6.0"
         },
-        "tzdata": {
-            "hashes": [
-                "sha256:8cc73c0a0bfca7dbfa59235d60b2eff82231dee33f53d206db1acd9173cfc0a7",
-                "sha256:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"
-            ],
-            "markers": "python_version >= '2'",
-            "version": "==2026.5"
-        },
         "urllib3": {
             "hashes": [
                 "sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
