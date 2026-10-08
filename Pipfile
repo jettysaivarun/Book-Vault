@@ -16,6 +16,7 @@ gunicorn = "*"
 django = "*"
 dotenv = "*"
 django-cors-headers = "*"
+whitenoise = "*"
 
 [dev-packages]
 
