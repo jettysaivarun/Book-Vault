@@ -15,6 +15,9 @@ import { motion } from 'framer-motion'
 import api from '../services/api'
 import NotificationBell from '../components/NotificationBell'
 import './Ebooks.css'
+import UserProfile from '../components/UserProfile'
+
+
 
 function EBooks() {
   const navigate = useNavigate()
@@ -305,11 +308,7 @@ function EBooks() {
 
             <div className="dashboard-user">
 
-              <div className="dashboard-avatar">
-                {username
-                  .charAt(0)
-                  .toUpperCase()}
-              </div>
+              <UserProfile avatarClassName="dashboard-avatar" />
 
               <div className="dashboard-user-name">
 
@@ -322,7 +321,7 @@ function EBooks() {
               </div>
 
               <span className="dashboard-user-arrow">
-                ˅
+                
               </span>
 
             </div>

@@ -15,6 +15,7 @@ RotateCcw,
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import BookDetails from './BookDetails'
+import UserProfile from '../components/UserProfile'
 import './AllBooks.css'
 import NotificationBell from '../components/NotificationBell'
 const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
@@ -314,9 +315,7 @@ return ( <main className="all-books-page">
 
         <div className="dashboard-user">
 
-          <div className="dashboard-avatar">
-            {username.charAt(0).toUpperCase()}
-          </div>
+          <UserProfile avatarClassName="dashboard-avatar" />
 
           <div className="dashboard-user-name">
 
@@ -331,7 +330,7 @@ return ( <main className="all-books-page">
           </div>
 
           <span className="dashboard-user-arrow">
-            ˅
+            
           </span>
 
         </div>

@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import NotificationBell from '../components/NotificationBell'
 import './MyBooks.css'
+import UserProfile from '../components/UserProfile'
+
 
 const API_URL = import.meta.env.VITE_API_URL || '${API_URL}'
 
@@ -511,9 +513,7 @@ function MyBooks() {
 
             <div className="dashboard-user">
 
-              <div className="dashboard-avatar">
-                {username.charAt(0).toUpperCase()}
-              </div>
+              <UserProfile avatarClassName="dashboard-avatar" />
 
               <div className="dashboard-user-name">
 
@@ -526,7 +526,7 @@ function MyBooks() {
               </div>
 
               <span className="dashboard-user-arrow">
-                ˅
+                
               </span>
 
             </div>

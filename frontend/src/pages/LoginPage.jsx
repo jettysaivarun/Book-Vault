@@ -55,11 +55,12 @@ function Login() {
         password,
       })
 
-      const { access, refresh } = response.data
+      const { access, refresh,email } = response.data
 
       localStorage.setItem('access_token', access)
       localStorage.setItem('refresh_token', refresh)
       localStorage.setItem('username', username.trim())
+      localStorage.setItem('email', email)
       navigate('/dashboard')
 
       console.log('Login successful')

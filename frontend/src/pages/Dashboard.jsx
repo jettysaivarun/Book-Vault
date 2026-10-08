@@ -1,4 +1,5 @@
 import BookDetails from './BookDetails'
+import UserProfile from '../components/UserProfile'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -226,9 +227,7 @@ function Dashboard() {
 
             <div className="dashboard-user">
 
-              <div className="dashboard-avatar">
-                {username.charAt(0).toUpperCase()}
-              </div>
+              <UserProfile avatarClassName="dashboard-avatar" />
 
               <div className="dashboard-user-name">
 
@@ -241,7 +240,7 @@ function Dashboard() {
               </div>
 
               <span className="dashboard-user-arrow">
-                ˅
+                
               </span>
 
             </div>

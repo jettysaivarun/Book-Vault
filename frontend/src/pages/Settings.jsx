@@ -27,6 +27,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import NotificationBell from '../components/NotificationBell'
 import api,{ logout } from '../services/api'
 import './Settings.css'
+import UserProfile from '../components/UserProfile'
+
 const API_URL =import.meta.env.VITE_API_URL || '${API_URL}'
 function Settings() {
   const navigate = useNavigate()
@@ -41,6 +43,7 @@ function Settings() {
   )
   const [newEmail, setNewEmail] = useState('')
   const [confirmEmail, setConfirmEmail] = useState('')
+  const [emailPassword, setEmailPassword] = useState('')
 
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -72,6 +75,8 @@ useEffect(() => {
       const response = await api.get(
         '/api/librarymanagement/members/current_member/'
       )
+      console.log('GET CURRENT MEMBER:', response.data)
+console.log('GET PROFILE URL:', response.data.profile_picture)
 
       setNotifications((previous) => ({
         ...previous,
@@ -80,8 +85,12 @@ useEffect(() => {
       }))
 
       if (response.data.profile_picture) {
-        setProfilePicture(response.data.profile_picture)
-      }
+  const profileUrl = response.data.profile_picture.startsWith('http')
+    ? response.data.profile_picture
+    : `https://res.cloudinary.com/y4b8yqds/${response.data.profile_picture}`
+
+  setProfilePicture(profileUrl)
+}
     } catch (error) {
       console.error(
         'Failed to load member data:',
@@ -235,8 +244,7 @@ const handleProfilePictureChange = async (event) => {
     },
   }
 )
-console.log('CURRENT MEMBER:', response.data)
-console.log('PROFILE URL:', response.data.profile_picture)
+
 
     setProfilePicture(response.data.profile_picture || previewUrl)
 
@@ -291,22 +299,53 @@ console.log('PROFILE URL:', response.data.profile_picture)
   }
 }
 
-  const handleEmailUpdate = (event) => {
-    event.preventDefault()
+  const handleEmailUpdate = async (event) => {
+  event.preventDefault()
 
-    if (
-      !newEmail.trim() ||
-      newEmail !== confirmEmail
-    ) {
-      return
-    }
+  const oldEmail = currentEmail.trim()
+  const newEmailValue = newEmail.trim()
 
-    localStorage.setItem('email', newEmail.trim())
+  if (!oldEmail || !newEmailValue || !confirmEmail || !emailPassword) {
+    alert('Please fill in all fields.')
+    return
+  }
 
-    setCurrentEmail(newEmail.trim())
+  if (newEmailValue !== confirmEmail.trim()) {
+    alert('New email addresses do not match.')
+    return
+  }
+
+  if (oldEmail === newEmailValue) {
+    alert('New email must be different from your current email.')
+    return
+  }
+
+  try {
+    await api.post('/api/auth/change_email/', {
+      old_email: oldEmail,
+      password: emailPassword,
+      new_email: newEmailValue,
+    })
+
+    localStorage.setItem('email', newEmailValue)
+
+    setCurrentEmail(newEmailValue)
     setNewEmail('')
     setConfirmEmail('')
+    setEmailPassword('')
+
+    alert('Email changed successfully.')
+  } catch (error) {
+    console.error('Email update failed:', error)
+
+    const message =
+      error.response?.data?.error ||
+      error.response?.data?.detail ||
+      'Unable to change email. Please try again.'
+
+    alert(message)
   }
+}
 
   const handlePasswordUpdate = async (event) => {
   event.preventDefault()
@@ -402,9 +441,7 @@ console.log('PROFILE URL:', response.data.profile_picture)
         <NotificationBell />
 
         <div className="settings-user">
-          <div className="settings-avatar">
-            {username.charAt(0).toUpperCase()}
-          </div>
+          <UserProfile avatarClassName="dashboard-avatar" />
 
           <div className="settings-user-name">
             <span>Hello,</span>
@@ -412,7 +449,7 @@ console.log('PROFILE URL:', response.data.profile_picture)
           </div>
 
           <span className="settings-user-arrow">
-            ˅
+            
           </span>
         </div>
       </div>
@@ -867,6 +904,22 @@ console.log('PROFILE URL:', response.data.profile_picture)
             <Mail size={17} />
           </div>
         </div>
+        <div className="settings-form-field">
+  <label>Password</label>
+
+  <div className="settings-input-container">
+    <input
+      type="password"
+      placeholder="Enter your password"
+      value={emailPassword}
+      onChange={(event) =>
+        setEmailPassword(event.target.value)
+      }
+    />
+
+    <Lock size={17} />
+  </div>
+</div>
 
         <button
           type="submit"
