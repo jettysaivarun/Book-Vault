@@ -115,3 +115,24 @@ class DeleteAccountView(APIView):
             return Response({"error":"Password is incorrect"},status=status.HTTP_400_BAD_REQUEST)
         user.delete()
         return Response({"message":"Account deleted successfully"},status=status.HTTP_200_OK)
+    
+class ChangeEmail(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        old_email=request.data.get('old_email')
+        password=request.data.get('password')
+        new_email=request.data.get('new_email')
+        if not old_email or not password or not new_email:
+            return Response({"error":"Required to fill all the fields"},status=status.HTTP_400_BAD_REQUEST)
+        member=Member.objects.get(user=request.user)
+        if member.user.email!=old_email:
+            return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+        if old_email==new_email:
+            return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+        if not member.user.check_password(password):
+            return Response({"error":"Invalid details"},status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(email=new_email).exclude(id=request.user.id).exists():
+            return Response({"error": "Email already exists"},status=status.HTTP_400_BAD_REQUEST)
+        member.user.email=new_email
+        member.user.save()
+        return Response({"message":"Email changed successfully"},status=status.HTTP_200_OK)
